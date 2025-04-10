@@ -57,3 +57,94 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+# Guía rápida para configurar Husky + Lint-Staged en este proyecto
+
+Este archivo describe cómo se configuró **Husky** y **lint-staged** para ejecutar `eslint` y `prettier` automáticamente antes de hacer un commit.
+
+---
+
+## ✅ Requisitos previos
+
+Asegurate de tener Node.js y Git instalados.
+
+---
+
+## ⚙️ Instalación de dependencias
+
+```bash
+npm install --save-dev husky lint-staged
+```
+
+---
+
+## 🔧 Configurar Husky
+
+### 1. Añadir el script `prepare` en package.json
+
+```bash
+npm pkg set scripts.prepare="husky install"
+```
+
+### 2. Ejecutar el script de instalación
+
+```bash
+npm run prepare
+```
+
+Este comando inicializa Husky y crea la carpeta `.husky/` en el proyecto.
+
+---
+
+## ✏️ Crear el hook `pre-commit`
+
+```bash
+npx husky add .husky/pre-commit "npx lint-staged"
+```
+
+Este comando crea automáticamente el archivo `.husky/pre-commit` con el siguiente contenido:
+
+```sh
+#!/usr/bin/env sh
+. "$(dirname "$0")/h"
+
+npx lint-staged
+```
+
+> ⚠️ ¡No modificar la ruta del `husky.sh` manualmente! La que genera Husky por defecto (`h`) es válida y funciona correctamente.
+
+---
+
+## 🎯 Configurar lint-staged
+
+Agregar esta sección en tu `package.json`:
+
+```json
+"lint-staged": {
+  "*.{ts,js,tsx,jsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ]
+}
+```
+
+Esto asegura que antes de cada commit se corran automáticamente `eslint` y `prettier` solo sobre los archivos modificados.
+
+---
+
+## ✅ Prueba final
+
+```bash
+git add <archivo>
+git commit -m "Probando husky y lint-staged"
+```
+
+Si todo está bien, se debería ejecutar lint-staged y luego permitir el commit.
+
+---
+
+## 🧠 Notas
+
+- Husky genera por defecto varios hooks. No es necesario modificarlos manualmente.
+- Si ves el error `No such file or directory`, probablemente editaste incorrectamente la ruta del `husky.sh`.
+
